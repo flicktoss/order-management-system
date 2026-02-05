@@ -1,5 +1,6 @@
 package com.project.order_management_system.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.project.order_management_system.entity.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 public class OrderResponse {
 

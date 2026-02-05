@@ -10,11 +10,12 @@ import com.project.order_management_system.repository.ProductRepository;
 import com.project.order_management_system.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
+    @CacheEvict(value = {"orders", "userOrders"}, allEntries = true)
     @Transactional
     public OrderResponse createOrder(CreateOrderRequest request) {
         log.info("Creating order for user ID: {}", request.getUserId());
@@ -63,6 +65,7 @@ public class OrderService {
             // Deduct stock
             product.setStock(product.getStock() - itemRequest.getQuantity());
             productRepository.save(product);
+            // Note: Product cache will be evicted when product is updated
 
             // Create order item with EXPLICIT subtotal calculation
             BigDecimal itemPrice = product.getPrice();
@@ -89,9 +92,10 @@ public class OrderService {
         return mapToOrderResponse(savedOrder);
     }
 
+    @Cacheable(value = "orders", key = "#id")
     @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long id) {
-        log.info("Fetching order with ID: {}", id);
+        log.info("Fetching order with ID: {} from database", id);
 
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", id));
@@ -99,9 +103,10 @@ public class OrderService {
         return mapToOrderResponse(order);
     }
 
+    @Cacheable(value = "orders", key = "'orderNumber:' + #orderNumber")
     @Transactional(readOnly = true)
     public OrderResponse getOrderByOrderNumber(String orderNumber) {
-        log.info("Fetching order with order number: {}", orderNumber);
+        log.info("Fetching order with order number: {} from database", orderNumber);
 
         Order order = orderRepository.findByOrderNumber(orderNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "orderNumber", orderNumber));
@@ -109,9 +114,10 @@ public class OrderService {
         return mapToOrderResponse(order);
     }
 
+    @Cacheable(value = "userOrders", key = "#userId")
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrdersByUserId(Long userId) {
-        log.info("Fetching orders for user ID: {}", userId);
+        log.info("Fetching orders for user ID: {} from database", userId);
 
         // Validate user exists
         userRepository.findById(userId)
@@ -133,9 +139,10 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    @CacheEvict(value = {"orders", "userOrders"}, allEntries = true)
     @Transactional
     public OrderResponse updateOrderStatus(Long id, OrderStatus newStatus) {
-        log.info("Updating order {} to status: {}", id, newStatus);
+        log.info("Updating order {} to status: {}, evicting cache", id, newStatus);
 
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", id));
@@ -151,9 +158,10 @@ public class OrderService {
         return mapToOrderResponse(updatedOrder);
     }
 
+    @CacheEvict(value = {"orders", "userOrders"}, allEntries = true)
     @Transactional
     public void cancelOrder(Long id) {
-        log.info("Cancelling order: {}", id);
+        log.info("Cancelling order: {}, evicting cache", id);
 
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", id));

@@ -1,6 +1,9 @@
 package com.project.order_management_system.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -10,6 +13,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
+@Getter
+@Setter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,6 +26,7 @@ public class Order {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @NotBlank(message = "Order number is required")
     private String orderNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,7 +37,9 @@ public class Order {
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
 
+    @NotNull(message = "Total amount is required")
     @Column(nullable = false, precision = 10, scale = 2)
+    @DecimalMin(value = "0.0", inclusive = true)
     private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
@@ -58,6 +66,7 @@ public class Order {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+        calculateTotal();
     }
 
     // Helper method to add items

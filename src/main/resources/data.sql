@@ -1,11 +1,3 @@
--- Insert sample users
-INSERT INTO users (name, email, phone, address, created_at, updated_at) VALUES
-('John Doe', 'john.doe@email.com', '+1-555-0101', '123 Main St, New York, NY 10001', NOW(), NOW()),
-('Jane Smith', 'jane.smith@email.com', '+1-555-0102', '456 Oak Ave, Los Angeles, CA 90001', NOW(), NOW()),
-('Bob Johnson', 'bob.johnson@email.com', '+1-555-0103', '789 Pine Rd, Chicago, IL 60601', NOW(), NOW());
-
-SELECT setval('id', (SELECT MAX(id) FROM users) + 1, false);
-
 -- Insert sample products
 INSERT INTO products (name, description, price, stock, active, category, image_url) VALUES
 ('Laptop Pro 15', 'High-performance laptop with 16GB RAM and 512GB SSD', 1299.99, 25, true, 'Electronics', 'https://example.com/laptop.jpg'),

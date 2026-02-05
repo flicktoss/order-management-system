@@ -1,6 +1,8 @@
 package com.project.order_management_system.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,6 +30,8 @@ public class OrderItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @NotNull(message = "Quantity is required")
+    @Min(value = 1, message = "Quantity must be at least 1")
     @Column(nullable = false)
     private Integer quantity;
 
@@ -37,14 +41,13 @@ public class OrderItem {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal;
 
-    // IMPORTANT: Calculate subtotal BEFORE persisting
     @PrePersist
     @PreUpdate
     public void calculateSubtotal() {
         if (this.price != null && this.quantity != null) {
             this.subtotal = this.price.multiply(BigDecimal.valueOf(this.quantity));
         } else {
-            this.subtotal = BigDecimal.ZERO;  // Default value
+            this.subtotal = BigDecimal.ZERO;
         }
     }
 }
