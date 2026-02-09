@@ -123,7 +123,6 @@ public class OrderController {
         return ResponseEntity.ok(Map.of(
                 "status", "UP",
                 "service", "Order Service",
-                "timestamp", java.time.LocalDateTime.now().toString()
-        ));
+                "timestamp", java.time.LocalDateTime.now().toString()));
     }
 }

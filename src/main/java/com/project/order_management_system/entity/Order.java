@@ -1,5 +1,8 @@
 package com.project.order_management_system.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -31,10 +34,13 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference("user-orders")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonManagedReference("order-items")
     private List<OrderItem> items = new ArrayList<>();
 
     @NotNull(message = "Total amount is required")
@@ -85,7 +91,7 @@ public class Order {
     public void calculateTotal() {
         this.totalAmount = items.stream()
                 .map(OrderItem::getSubtotal)
-                .filter(subtotal -> subtotal != null)  // ← FILTER OUT NULLS
+                .filter(subtotal -> subtotal != null) // ← FILTER OUT NULLS
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

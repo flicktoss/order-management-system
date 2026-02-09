@@ -1,5 +1,8 @@
 package com.project.order_management_system.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +27,8 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonBackReference("order-items")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
     private Order order;
 
     @ManyToOne(fetch = FetchType.EAGER)

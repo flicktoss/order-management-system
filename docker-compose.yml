@@ -24,7 +24,7 @@ services:
       - redis_data:/data
     networks:
       - order-network
-    command: redis-server --appendonly yes
+    command: redis-server --requirepass njasani6618 --appendonly yes
 
 volumes:
   postgres_data:
