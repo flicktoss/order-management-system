@@ -56,13 +56,6 @@ public class ProductService {
 
     @CacheEvict(value = "products", allEntries = true)
     @Transactional
-    public Product createProduct(Product product) {
-        log.info("Creating new product: {}, evicting cache", product.getName());
-        return productRepository.save(product);
-    }
-
-    @CacheEvict(value = "products", allEntries = true)
-    @Transactional
     public Product updateProduct(Product product) {
         log.info("Updating product with ID: {}, evicting cache", product.getId());
         return productRepository.save(product);
