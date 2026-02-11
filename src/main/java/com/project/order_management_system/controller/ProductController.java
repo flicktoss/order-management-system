@@ -2,9 +2,12 @@ package com.project.order_management_system.controller;
 
 import com.project.order_management_system.entity.Product;
 import com.project.order_management_system.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,5 +62,17 @@ public class ProductController {
         log.info("Received get products by category request: {}", category);
         List<Product> products = productService.getProductsByCategory(category);
         return ResponseEntity.ok(products);
+    }
+
+    /**
+     * Create a new product (ADMIN only)
+     * POST /api/v1/products
+     */
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
+        log.info("Received create product request: {}", product.getName());
+        Product createdProduct = productService.createProduct(product);
+        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 }
