@@ -16,14 +16,25 @@ export const formatCurrency = (amount) => {
  * @returns {string} Formatted date
  */
 export const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-IN', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date);
+  if (!dateString) return 'N/A';
+  try {
+    const date = new Date(dateString);
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date received:', dateString);
+      return typeof dateString === 'string' ? dateString : 'Invalid Date';
+    }
+    return new Intl.DateTimeFormat('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  } catch (e) {
+    console.error('Error formatting date:', e);
+    return 'Date Error';
+  }
 };
 
 /**
@@ -32,12 +43,19 @@ export const formatDate = (dateString) => {
  * @returns {string} Formatted date
  */
 export const formatDateShort = (dateString) => {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-IN', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  }).format(date);
+  if (!dateString) return 'N/A';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Invalid Date';
+    
+    return new Intl.DateTimeFormat('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format(date);
+  } catch (e) {
+    return 'Date Error';
+  }
 };
 
 /**

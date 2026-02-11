@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthContext';
+import { CartProvider } from './context/CartContext';
 import ProtectedRoute from './auth/ProtectedRoute';
 import Navbar from './components/Navbar';
 
@@ -17,30 +18,33 @@ import Users from './pages/Users';
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <div className="min-h-screen bg-background">
-          <Navbar />
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+      <CartProvider>
+        <BrowserRouter>
+          {/* ... existing content ... */}
+          <div className="min-h-screen bg-background">
+            <Navbar />
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-            {/* Protected Routes */}
-            <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
-            <Route path="/products/:id" element={<ProtectedRoute><ProductDetails /></ProtectedRoute>} />
-            <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-            <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-            <Route path="/orders/:id" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
+              {/* Protected Routes */}
+              <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
+              <Route path="/products/:id" element={<ProtectedRoute><ProductDetails /></ProtectedRoute>} />
+              <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+              <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+              <Route path="/orders/:id" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
 
-            {/* Admin Routes */}
-            <Route path="/admin/orders" element={<ProtectedRoute requiredRole="ADMIN"><AdminOrders /></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute requiredRole="ADMIN"><Users /></ProtectedRoute>} />
+              {/* Admin Routes */}
+              <Route path="/admin/orders" element={<ProtectedRoute requiredRole="ADMIN"><AdminOrders /></ProtectedRoute>} />
+              <Route path="/admin/users" element={<ProtectedRoute requiredRole="ADMIN"><Users /></ProtectedRoute>} />
 
-            {/* Default Redirect */}
-            <Route path="/" element={<Navigate to="/products" replace />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
+              {/* Default Redirect */}
+              <Route path="/" element={<Navigate to="/products" replace />} />
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </CartProvider>
     </AuthProvider>
   );
 }

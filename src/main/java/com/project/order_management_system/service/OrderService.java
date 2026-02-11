@@ -29,7 +29,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
-    @CacheEvict(value = {"orders", "userOrders"}, allEntries = true)
+    @CacheEvict(value = { "orders", "userOrders", "products" }, allEntries = true)
     @Transactional
     public OrderResponse createOrder(CreateOrderRequest request) {
         log.info("Creating order for user ID: {}", request.getUserId());
@@ -58,14 +58,13 @@ public class OrderService {
                 throw new InsufficientStockException(
                         product.getName(),
                         itemRequest.getQuantity(),
-                        product.getStock()
-                );
+                        product.getStock());
             }
 
             // Deduct stock
             product.setStock(product.getStock() - itemRequest.getQuantity());
             productRepository.save(product);
-            // Note: Product cache will be evicted when product is updated
+            // Note: Product cache is now evicted because we added "products" to CacheEvict
 
             // Create order item with EXPLICIT subtotal calculation
             BigDecimal itemPrice = product.getPrice();
@@ -76,7 +75,7 @@ public class OrderService {
                     .product(product)
                     .quantity(itemQuantity)
                     .price(itemPrice)
-                    .subtotal(itemSubtotal)  // ← EXPLICITLY SET SUBTOTAL
+                    .subtotal(itemSubtotal) // ← EXPLICITLY SET SUBTOTAL
                     .build();
 
             order.addItem(orderItem);
@@ -139,7 +138,7 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    @CacheEvict(value = {"orders", "userOrders"}, allEntries = true)
+    @CacheEvict(value = { "orders", "userOrders" }, allEntries = true)
     @Transactional
     public OrderResponse updateOrderStatus(Long id, OrderStatus newStatus) {
         log.info("Updating order {} to status: {}, evicting cache", id, newStatus);
@@ -158,7 +157,7 @@ public class OrderService {
         return mapToOrderResponse(updatedOrder);
     }
 
-    @CacheEvict(value = {"orders", "userOrders"}, allEntries = true)
+    @CacheEvict(value = { "orders", "userOrders", "products" }, allEntries = true)
     @Transactional
     public void cancelOrder(Long id) {
         log.info("Cancelling order: {}, evicting cache", id);
